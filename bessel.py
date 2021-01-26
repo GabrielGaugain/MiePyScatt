@@ -37,18 +37,23 @@ def d_hn1(n,x):
     return spe.spherical_jn(n,x,derivative =True) + 1j*spe.spherical_yn(n,x,derivative =True)
 
 
-# just for notations
-def d_jn1(n,x):
-
-    return spe.spherical_jn(n,x,derivative =True) 
-
 
 ### riccati bessel functions
-def rh_n1(n,x):
+
+def rj(n,x):
+
+    return x* spe.spherical_jn(n,x)
+
+
+def d_rj(n,x):
+
+    return spe.spherical_jn(n,x) + x*spe.spherical_jn(n,x, derivative=True)
+
+def rh(n,x):
 
     return x*hn1(n,x)
 
-def d_rh_n1(n,x):
+def d_rh(n,x):
 
     return hn1(n,x) + x*d_hn1(n,x)
 
