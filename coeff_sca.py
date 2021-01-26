@@ -2,6 +2,13 @@ import scipy.special as spe
 import numpy as np
 from bessel import rj,rh,d_rh, d_rj
 
+
+##################################################################################
+###       Script for the caclulation of coefficient for the external field     ###
+##################################################################################
+
+
+
 def calc_coeff_int(n,k_int, k_ext, a):
       """
       Calculate the scattered field coefficient a_n and b_n 

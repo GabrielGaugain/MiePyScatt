@@ -3,6 +3,11 @@ import numpy as np
 from bessel import rj,rh,d_rh, d_rj
 
 
+
+##################################################################################
+###       Script for the caclulation of coefficient for the internal field     ###
+##################################################################################
+
 def calc_coeff_int(n,k_int, k_ext, a):
       """
       Calculate the internal field coefficient c_n and d_n 

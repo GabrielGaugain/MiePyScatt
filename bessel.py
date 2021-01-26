@@ -1,6 +1,9 @@
 import scipy.special as spe
 
 
+###################################################################################
+###   Script defining spherical Bessel's function and associated Riccati ones   ###
+###################################################################################
 
 ### hankel's functions 
 def hn1(n,x):
