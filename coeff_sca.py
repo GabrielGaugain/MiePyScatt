@@ -5,7 +5,7 @@ from bessel import rj,rh,d_rh, d_rj
 def calc_coeff_int(n,k_int, k_ext, a):
       """
       Calculate the scattered field coefficient a_n and b_n 
-      Calculation derived from [1] C. F. ohren, D. R. Huffman, Absorption an scattering of light by small particle
+      Calculation derived from [1] C. F. ohren, D. R. Huffman, Absorption and scattering of light by small particle
 
       Here, rj (resp rh) is the Riccati Bessel's function of the first kind (resp third kind)
       and d_rj (resp d_rh) is its derivative. These functions are calculated in the bessel.py file.
