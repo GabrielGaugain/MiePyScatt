@@ -72,11 +72,11 @@ if __name__=="__main__":
     print("---------------\n")
 
     print("rh_01(3)")
-    print(rh_n1(0,3))
+    print(rh(0,3))
     print("---------------\n")
 
     print("d_rh_01(3)")
-    print(d_rh_n1(0,3))
+    print(d_rh(0,3))
     print("---------------\n")
 
 
