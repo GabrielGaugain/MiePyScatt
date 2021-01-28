@@ -35,7 +35,7 @@ def M_o1n(n,order,rho,theta,phi, pi_n, tau_n):
 
 
 
-def M_e1n(n, rho, theta, phi, pi_n, tau_n):
+def M_e1n(n, order, rho, theta, phi, pi_n, tau_n):
 
     if (order ==1 ):
         z_n = spe.spherical_jn(n,rho)
@@ -55,7 +55,7 @@ def M_e1n(n, rho, theta, phi, pi_n, tau_n):
     return m_e1n
 
 
-def N_o1n(n,theta,phi, pi_n, tau_n):
+def N_o1n(n, order, rho, theta,phi, pi_n, tau_n):
 
 
     if (order ==1 ):
@@ -71,7 +71,7 @@ def N_o1n(n,theta,phi, pi_n, tau_n):
     n_o1n = np.zeros((np.size(theta),3 ))
 
 
-    n_o1n[:,0] = np.sin(phi)* n*(n+1)*sin(theta)* pi_n * z_n / rho   # e_r
+    n_o1n[:,0] = np.sin(phi)* n*(n+1)*np.sin(theta)* pi_n * z_n / rho   # e_r
 
     n_o1n[:,1] = np.sin(phi) * tau_n * d_r /rho                     # e_theta
 
@@ -81,7 +81,7 @@ def N_o1n(n,theta,phi, pi_n, tau_n):
 
 
 
-def N_e1n(n,theta,phi, pi_n, tau_n):
+def N_e1n(n, order, rho, theta,phi, pi_n, tau_n):
 
 
     if (order ==1 ):
@@ -97,7 +97,7 @@ def N_e1n(n,theta,phi, pi_n, tau_n):
     n_e1n = np.zeros((np.size(theta),3 ))
 
 
-    n_e1n[:,0] = np.cos(phi)* n*(n+1)*sin(theta)* pi_n * z_n / rho   # e_r
+    n_e1n[:,0] = np.cos(phi)* n*(n+1)*np.sin(theta)* pi_n * z_n / rho   # e_r
 
     n_e1n[:,1] = np.cos(phi) * tau_n * d_r /rho                     # e_theta
 
