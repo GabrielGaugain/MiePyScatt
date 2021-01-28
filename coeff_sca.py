@@ -9,7 +9,7 @@ from bessel import rj,rh,d_rh, d_rj
 
 
 
-def calc_coeff_int(n,k_int, k_ext, a):
+def calc_coeff_scat(n,k_int, k_ext, a):
       """
       Calculate the scattered field coefficient a_n and b_n 
       Calculation derived from [1] C. F. ohren, D. R. Huffman, Absorption and scattering of light by small particle
