@@ -1,5 +1,9 @@
-Computation of Mie scattering theory for incident electromagnetic plane wave on a sphere.
+## MiePyScatt
+Gaugain Gabriel (gabriel.gaugain@univ-rennes1.fr)
+
+Implementation of the Mie scattering theory for incident electromagnetic plane wave on a (dielectric) sphere.
 All the calculation are based on the following theoretical book:
 
 [1]C. F. Bohren et D. R. Huffman, Absorption and Scattering of Light by Small Particles, 1ʳᵉ éd. Wiley, 1998.
+
 
