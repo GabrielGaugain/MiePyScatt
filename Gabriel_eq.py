@@ -4,6 +4,10 @@ import ntpath
 import matplotlib.pyplot as plt
 from scipy.constants import mu_0, epsilon_0
 
+####################################################################
+###   Script for dielectric properties of tissues calculations   ###
+####################################################################
+
 
 
 def Gabriels_Permitivity(omega, ef, sigma, deltas, alphas, taus):
@@ -14,10 +18,10 @@ def Gabriels_Permitivity(omega, ef, sigma, deltas, alphas, taus):
     
     Params : 
     --------
-                   omega : frequency | real 
-                    ef    : permtivity at HF | real
-                    sigma : conductivity | real
-                    deltas,alphas , taus : lists of 4 parameters in the sum of Gabriel's equation (Cole Cole interaction) |List[real]
+                omega : frequency | real 
+                ef    : permtivity at HF | real
+                sigma : conductivity | real
+                deltas,alphas , taus : lists of 4 parameters in the sum of Gabriel's equation (Cole Cole interaction) |List[real]
 
     Returns :
     ---------
@@ -109,7 +113,7 @@ def get_Params(df, tissues):
 
     return Params
 
-
+## ---- END get_Params() ---- ##
 
 def diel_save(dict):
     """
@@ -124,6 +128,8 @@ def diel_save(dict):
             isSaved :   Boolean | True if the data is correctly saved, else False
 
     """
+
+    ## To be completed
     isSaved = False
 
     return isSaved
@@ -132,9 +138,9 @@ def diel_save(dict):
 
 
 
-def spectrum_computing(Params, f= np.arange(10,10**6, 1) , tissue = "some tissue", plot=True ):
+def spectrum_computing(Params, f= np.arange(10,10**6, 1) , tissue = "some tissue", plot=False ):
     """
-    Compute the Gabriel's equation for the permitivity between 10hz to 100 kHz
+    Compute the Gabriel's equation for the permitivity between 10hz to 100 kHz (default) or the frequency range provided
 
     Params :
     --------
@@ -148,30 +154,35 @@ def spectrum_computing(Params, f= np.arange(10,10**6, 1) , tissue = "some tissue
     ---------
                 permitivities   :   complex array containing permitivity in the range 10Hz-100kHz
 
-    """
+    """   
 
-    ## frequency array from 10Hz to 1MHz => past in param
-    ## f = np.arange(10,10**6, 1) 
-    
     ## init array
     permitivities = np.zeros(f.shape)
-
 
     ## Compute the perm thanks to the function Gabriels_Permitivity. 
     permitivities = Gabriels_Permitivity( 2*np.pi*f, Params["ef"], Params["sig"], Params["deltas"], Params["alphas"], Params["taus"])
 
     ## Get conductivitie : \omega Im(e)e_0
-    conduct = np.imag(permitivities)*epsilon_0*2*np.pi*f
+    conduct = -np.imag(permitivities)*epsilon_0*2*np.pi*f
 
     if plot:
-        ## plot of the real part of permitivity in log-log scales
-        plt.figure()
-        plt.loglog(f, permitivities.real, 'k')
-        plt.loglog(f, conduct, color="black", linestyle='dashed' )
-        plt.xlabel( "frequency (Hz)")
-        #plt.ylabel("permitivity (F.m-1)")
-        plt.legend(["permitivity","conductivity"])
-        plt.title("Real part of the permitivity in "+tissue)
+        ## plot of the real part of relative permitivity in log-log scale
+        fig, ax1 = plt.subplots()
+        ax2 = ax1.twinx() ## to add another y-axis for conductivity
+
+        color1, color2 = "darkblue", "darkred"
+
+        ax1.loglog(f, permitivities.real, color=color1)
+        ax1.set_ylabel("Relative permitivity ", color=color1)
+        ax1.tick_params(axis='y', labelcolor=color1)
+        ax1.set_xlabel( "frequency (Hz)")
+
+        ax2.loglog(f, conduct, color=color2, linestyle='dashed' )
+        ax2.set_ylabel("Conductivity (S/m)", color=color2)
+        ax2.tick_params(axis='y', labelcolor=color2)
+        
+        fig.tight_layout()
+        plt.title("Dielectric properties of  "+tissue)
         #plt.xlim((5, 10000000))
         #plt.ylim((permitivities[-1].real/10,permitivities[0].real*10 )) ## set to have a little blanc range on top and bottom of the curve
         plt.grid()
@@ -241,8 +252,6 @@ def get_allP_to_OneW(f, dataframe ):
 
 
 
-
-
 def main():
     """
     Main function of this script => to modify to play with functions and get the result you want
@@ -250,8 +259,8 @@ def main():
 
     ## tissue(s) to investigate / Tissue(s) of Interest
     #tissue = "Brain (Grey Matter)"
-    #tissue = "Bone (Cortical)"
-    tissues = np.array(["Bone (Cortical)", "Brain (White Matter)", "Brain (Grey Matter)", "Skin","Cerebrospinal Fluid"])
+    tissues = np.array(["Bone (Cortical)"])
+    #tissues = np.array(["Bone (Cortical)", "Brain (White Matter)", "Brain (Grey Matter)", "Skin","Cerebrospinal Fluid"])
 
     ## read the file 
     df = diel_read()
@@ -283,9 +292,8 @@ def main():
         plt.subplot(211)
         plt.loglog(freqs, Rel_perm, 'k')
         plt.xlabel( "frequency (Hz)")
-        plt.ylabel("permitivity (F.m-1)")
-        plt.legend("max of permitivities")
-        plt.title("Max permitivity of all tissues and its inverse")
+        plt.ylabel("Relative permitivity ")
+        plt.title("Relative permitivity of "+  tissue)
         #plt.xlim((5, 10000000))
         #plt.ylim((permitivities[-1].real/10,permitivities[0].real*10 )) ## set to have a little blanc range on top and bottom of the curve
         plt.grid()
@@ -305,8 +313,7 @@ def main():
         err = freqs[  freqs**2 *Rel_perm *0.16**2 *mu_0*epsilon_0 > np.ones(Rel_perm.shape)*0.01   ]
         min_f[i] = err[0]
 
-
-
+    ## end for tissues
 
     print(tissues)
     print(min_f)
@@ -322,9 +329,8 @@ def main():
             f_cond.write( str(freqs[i]) + ' '  + str(conduct[i])+ '\n')
     """
 
-
-    """
     ## SECTION COMPUTING ALL perm for ALL tissues
+    """    
     freqs = [10,50,100,200,500,1000,2500,10000]
     ## freqs = np.concatenate(( np.arange(0,1000,10) , np.arange(1250,100000,250) , np.arange(101000,10000000,1000) ))
     perm  =get_allP_to_OneW(  freqs, df ) 
@@ -337,9 +343,8 @@ def main():
     e_max = np.nanmax( np.real(perm), axis=0 )
     """
 
+    ## SECTION TO SAVE THE DATA in an excel file
     """
-    ## SECTION TO SAVE THE DATA
-
     ## create pandas dataframes with first col as names and others perm at different freq in Hz
     Real_perm = pd.DataFrame(np.concatenate(( names, np.real(perm)), axis=1  ).T, 
                             
@@ -351,8 +356,7 @@ def main():
                              columns=['Name']+freqs
                             )    
     
-    
-       
+
     ## Write the data in differents sheets for real and imaginary parts
     
     writer = pd.ExcelWriter('PermitivitiesTest.xlsx')
