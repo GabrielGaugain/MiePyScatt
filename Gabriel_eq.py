@@ -80,36 +80,44 @@ def diel_read(path="", filename ="diel.xlsx"):
 
 
 def get_Params(df, tissues):
+    
+    if isinstance(tissues, str):
+        tissues = np.array([tissues])
 
-    N_tissues = np.size(tissues)
+    try:
+        N_tissues = np.size(tissues)
 
-    Params = {  "tissues" : tissues, \
-                "ef":np.zeros((N_tissues,1)), "sig":np.zeros((N_tissues,1)), \
-                "alphas":np.zeros((N_tissues,4)), "taus": np.zeros((N_tissues,4)), "deltas": np.zeros((N_tissues,4)) \
-             }
+        Params = {  "tissues" : tissues, \
+                    "ef":np.zeros((N_tissues,1)), "sig":np.zeros((N_tissues,1)), \
+                    "alphas":np.zeros((N_tissues,4)), "taus": np.zeros((N_tissues,4)), "deltas": np.zeros((N_tissues,4)) \
+                }
 
 
-    for i,tissue in enumerate(tissues):
+        for i,tissue in enumerate(tissues):
 
-        ## selecting the tissue of interest to compute its permitivity
-        TOI = df[df["Name"]== tissue]
-        # print(TOI)  # Uncomment to print the line corresponding to the tissue of interest
+            ## selecting the tissue of interest to compute its permitivity
+            TOI = df[df["Name"]== tissue]
+            # print(TOI)  # Uncomment to print the line corresponding to the tissue of interest
 
-        ## extracting the params of this tissues from the dataframe
-        alphas = TOI.iloc[0, [ ('alf' in col) for col in TOI.columns ]].values
-        Params["alphas"][i,:] = alphas
+            ## extracting the params of this tissues from the dataframe
+            alphas = TOI.iloc[0, [ ('alf' in col) for col in TOI.columns ]].values
+            Params["alphas"][i,:] = alphas
 
-        taus = TOI.iloc[0, [('tau' in col) for col in TOI.columns] ].values * np.array([ 10**(-12), 10**(-9), 10**(-6), 10**(-3)] )    ## Careful to unity for time variables (ps, ns, µs, ms)
-        Params["taus"][i,:] = taus
+            taus = TOI.iloc[0, [('tau' in col) for col in TOI.columns] ].values * np.array([ 10**(-12), 10**(-9), 10**(-6), 10**(-3)] )    ## Careful to unity for time variables (ps, ns, µs, ms)
+            Params["taus"][i,:] = taus
 
-        deltas = TOI.iloc[0, [('del' in col) for col in TOI.columns] ].values
-        Params["deltas"][i,:] = deltas
+            deltas = TOI.iloc[0, [('del' in col) for col in TOI.columns] ].values
+            Params["deltas"][i,:] = deltas
 
-        ef = TOI["ef"].values[0]
-        Params["ef"][i] = ef
+            ef = TOI["ef"].values[0]
+            Params["ef"][i] = ef
 
-        sigma = TOI["sig"].values[0]
-        Params["sig"][i] = sigma
+            sigma = TOI["sig"].values[0]
+            Params["sig"][i] = sigma
+        
+    except:
+        print("WARNING : the tissue is not find in the table, use a tissue contained in the file")
+        Params = []
 
     return Params
 
@@ -163,7 +171,7 @@ def diel_save(dict):
 
 
 
-def spectrum_computing(Params, f= np.arange(10,10**6, 1) , tissue = "some tissue", plot=False ):
+def spectrum_computing(Params, f= np.logspace(1,8,10**4) , tissue = "some tissue", plot=False ):
     """
     Compute the Gabriel's equation for the permitivity between 10hz to 100 kHz (default) or the frequency range provided
 
@@ -182,7 +190,7 @@ def spectrum_computing(Params, f= np.arange(10,10**6, 1) , tissue = "some tissue
     """   
 
     ## init array
-    permitivities = np.zeros(f.shape)
+    permitivities = np.zeros(np.size(f))
 
     ## Compute the perm thanks to the function Gabriels_Permitivity. 
     permitivities = Gabriels_Permitivity( 2*np.pi*f, Params["ef"], Params["sig"], Params["deltas"], Params["alphas"], Params["taus"])
@@ -276,6 +284,58 @@ def get_allP_to_OneW(f, dataframe ):
 ## ---- END get_allP_to_OneW() ---- ##
 
 
+################ => most usefull function to get properties for another script
+
+def get_diel_propertis(tissues, freqs= np.logspace(1,8,10**5)):
+    """
+    Compute the Gabriel's equation for the permitivity between 10hz to 10 MHz (default) or the frequency range provided,
+    and returns the relative permitivities (real part) and conductivities for each tissue.
+
+    Params :
+    --------
+                tissues :   str or array[str] | str name of the tissue investigated (just for the title of the plot) |   DEFAULT = "some tissue"
+                f       :   array[float]      | frequecies on which to compute the permitivity |   DEFAULT = [ 10Hz, 100kHz] pas de 1 Hz
+
+    Returns :
+    ---------
+                permitivities   :   array[float]  | Relative permitivities of each tissues computed of the provided freq range
+                conductivities  :   array[float]  | Relative permitivities of each tissues computed of the provided freq range
+
+    """   
+
+    if isinstance(tissues, str):
+        tissues = np.array([tissues])
+
+    ## read the file
+    df = diel_read()
+
+    ## get parameters needed for Gabriel's model (Cole-Cole)S
+    P = get_Params(df, tissues)
+
+
+    if (P == []):
+        print("Failed to get parameters from file - the provided tissues do not exist")
+        return 
+
+    permitivities, conductivities = np.zeros( (np.size(tissues), np.size(freqs)) ), np.zeros( (np.size(tissues), np.size(freqs)) )
+    
+    for i,tissue in enumerate(tissues):
+
+        ## get parameters for the i th tissue
+        Params = {"ef": P["ef"][i], "sig":P["sig"][i],"alphas":P["alphas"][i,:], "taus": P["taus"][i,:], "deltas": P["deltas"][i,:]} 
+
+        ## computing complex permitivity and plot it (10Hz - 10 kHz by default) 
+        spec = spectrum_computing(Params,f=freqs, tissue=tissue, plot=False)
+
+        permitivities[i, :] = spec.real
+        conductivities[i,:] =    -np.imag(spec)*epsilon_0*2*np.pi*freqs
+
+
+    return permitivities , conductivities
+
+## ---- END get_diel_properties() ---- ##
+
+
 
 def main():
     """
@@ -304,7 +364,7 @@ def main():
         Params = {"ef": P["ef"][i], "sig":P["sig"][i],"alphas":P["alphas"][i,:], "taus": P["taus"][i,:], "deltas": P["deltas"][i,:]} 
         
         ## computing complex permitivity and plot it (10Hz - 100 kHz by default) 
-        freqs= np.logspace(1,8,10**4)
+        freqs= np.logspace(1,8,10**5)
         spec = spectrum_computing(Params,f=freqs, tissue=tissue, plot=True)
 
         Rel_perm = spec.real
