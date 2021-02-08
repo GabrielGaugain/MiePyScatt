@@ -129,6 +129,31 @@ def diel_save(dict):
 
     """
 
+
+    ## SECTION TO SAVE THE DATA in an excel file
+    """
+    ## create pandas dataframes with first col as names and others perm at different freq in Hz
+    Real_perm = pd.DataFrame(np.concatenate(( names, np.real(perm)), axis=1  ).T, 
+                            
+                           )
+
+    #print( np.concatenate(( names, np.real(perm)[0]), axis=1  ) )
+  
+    Imag_perm = pd.DataFrame(np.concatenate(( names , np.imag(perm)), axis=1  ), 
+                             columns=['Name']+freqs
+                            )    
+    
+
+    ## Write the data in differents sheets for real and imaginary parts
+    
+    writer = pd.ExcelWriter('PermitivitiesTest.xlsx')
+
+    Real_perm.to_excel(writer, 'Real_eps')
+    #Imag_perm.to_excel(writer, 'Imag eps')
+
+    writer.save()
+    """    
+
     ## To be completed
     isSaved = False
 
@@ -168,6 +193,7 @@ def spectrum_computing(Params, f= np.arange(10,10**6, 1) , tissue = "some tissue
     if plot:
         ## plot of the real part of relative permitivity in log-log scale
         fig, ax1 = plt.subplots()
+        plt.title("Dielectric properties of  "+tissue)
         ax2 = ax1.twinx() ## to add another y-axis for conductivity
 
         color1, color2 = "darkblue", "darkred"
@@ -182,7 +208,6 @@ def spectrum_computing(Params, f= np.arange(10,10**6, 1) , tissue = "some tissue
         ax2.tick_params(axis='y', labelcolor=color2)
         
         fig.tight_layout()
-        plt.title("Dielectric properties of  "+tissue)
         #plt.xlim((5, 10000000))
         #plt.ylim((permitivities[-1].real/10,permitivities[0].real*10 )) ## set to have a little blanc range on top and bottom of the curve
         plt.grid()
@@ -280,7 +305,7 @@ def main():
         
         ## computing complex permitivity and plot it (10Hz - 100 kHz by default) 
         freqs= np.logspace(1,8,10**4)
-        spec = spectrum_computing(Params,f=freqs, tissue=tissue, plot=False)
+        spec = spectrum_computing(Params,f=freqs, tissue=tissue, plot=True)
 
         Rel_perm = spec.real
         #print(spec.size)
@@ -343,29 +368,6 @@ def main():
     e_max = np.nanmax( np.real(perm), axis=0 )
     """
 
-    ## SECTION TO SAVE THE DATA in an excel file
-    """
-    ## create pandas dataframes with first col as names and others perm at different freq in Hz
-    Real_perm = pd.DataFrame(np.concatenate(( names, np.real(perm)), axis=1  ).T, 
-                            
-                           )
-
-    #print( np.concatenate(( names, np.real(perm)[0]), axis=1  ) )
-  
-    Imag_perm = pd.DataFrame(np.concatenate(( names , np.imag(perm)), axis=1  ), 
-                             columns=['Name']+freqs
-                            )    
-    
-
-    ## Write the data in differents sheets for real and imaginary parts
-    
-    writer = pd.ExcelWriter('PermitivitiesTest.xlsx')
-
-    Real_perm.to_excel(writer, 'Real_eps')
-    #Imag_perm.to_excel(writer, 'Imag eps')
-
-    writer.save()
-    """
 
 ## ---- END main() ---- ##
 

@@ -12,8 +12,6 @@ from spherical_vectors import M_o1n, M_e1n, N_e1n, N_o1n
 
 
 
-
-
 def E_internal(r, theta, phi, k_int, k_ext, a, E_0 = 1, N=10):
 
     ## calculation of the associated legendre polynomials of the first order
@@ -23,8 +21,7 @@ def E_internal(r, theta, phi, k_int, k_ext, a, E_0 = 1, N=10):
 
     pi_n, tau_n = spe.lpmn(1,N, np.cos(theta))
 
-    pi_n = pi_n/np.sin(theta)     
-
+    #pi_n = pi_n/np.sin(theta)     
 
     E_i = np.zeros( (np.size(r), 3) )
 
@@ -51,7 +48,7 @@ def E_scattered(r, theta, phi, k_int, k_ext, a, E_0 = 1, N=10):
    
     pi_n, tau_n = spe.lpmn(1,N, np.cos(theta))
     
-    pi_n = pi_n/np.sin(theta)     
+    #pi_n = pi_n/np.sin(theta)     
 
 
     E_s = np.zeros( (np.size(r),3) )
