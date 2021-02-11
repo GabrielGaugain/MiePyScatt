@@ -19,7 +19,7 @@ def E_internal(r, theta, phi, k_int, k_ext, a, E_0 = 1, N=N_max):
 
     assert (np.size(r)==np.size(theta))&(np.size(theta)==np.size(phi)) , "r, phi and theta should have the same size !!!"
 
-    pi_n, tau_n = spe.lpmn(1,N, np.cos(theta))
+    pi_n, tau_n = angle_functions(N, np.cos(theta))
 
     #pi_n = pi_n/np.sin(theta)     
 
@@ -27,12 +27,12 @@ def E_internal(r, theta, phi, k_int, k_ext, a, E_0 = 1, N=N_max):
 
     for n in range(1,N+1):
 
-        E_n = E_0* np.i**(n) * (2*n + 1)/( n * (n+1) )
+        E_n = E_0* 1j**(n) * (2*n + 1)/( n * (n+1) )
 
         c_n, d_n = calc_coeff_int(n, k_int, k_ext, a)
 
-        E_i = E_i + E_n* (       c_n * M_o1n(n, 1, k_int*r, theta, phi, pi_n, tau_n)  \
-                  -        np.i* d_n * N_e1n(n, 1, k_int*r, theta, phi, pi_n, tau_n) )
+        E_i = E_i + E_n* (     c_n * M_o1n(n, 1, k_int*r, theta, phi, pi_n[:,n-1], tau_n[:,n-1])  \
+                  -        1j* d_n * N_e1n(n, 1, k_int*r, theta, phi, pi_n[:,n-1], tau_n[:,n-1]) )
 
         ##end for 
 
@@ -48,18 +48,16 @@ def E_scattered(r, theta, phi, k_int, k_ext, a, E_0 = 1, N=N_max):
    
     pi_n, tau_n = angle_functions(N, np.cos(theta))
 
-    print("angle function - OK ")
-
     E_s = np.zeros( (np.size(r),3) )
 
     for n in range(1,N+1):
 
-        E_n = E_0* np.i**(n) * (2*n + 1)/( n * (n+1) )
+        E_n = E_0* 1j**(n) * (2*n + 1)/( n * (n+1) )
 
         a_n, b_n = calc_coeff_scat(n, k_int, k_ext, a)
 
-        E_s = E_s  + E_n * ( np.i* a_n * N_e1n(n, 3, k_ext*r, theta, phi, pi_n[:,n-1], tau_n[:,n])    \
-                   -               b_n * M_o1n(n, 3, k_ext*r, theta, phi, pi_n[:,n-1], tau_n[:,n])  )
+        E_s = E_s  + E_n * ( 1j* a_n * N_e1n(n, 3, k_ext*r, theta, phi, pi_n[:,n-1], tau_n[:,n-1])    \
+                   -             b_n * M_o1n(n, 3, k_ext*r, theta, phi, pi_n[:,n-1], tau_n[:,n-1])  )
 
         ##end for 
 
