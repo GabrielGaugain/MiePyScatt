@@ -286,7 +286,7 @@ def get_allP_to_OneW(f, dataframe ):
 
 ################ => most usefull function to get properties for another script
 
-def get_diel_propertis(tissues, freqs= np.logspace(1,8,10**5)):
+def get_diel_properties(tissues, freqs= np.logspace(1,8,10**5)):
     """
     Compute the Gabriel's equation for the permitivity between 10hz to 10 MHz (default) or the frequency range provided,
     and returns the relative permitivities (real part) and conductivities for each tissue.

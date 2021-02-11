@@ -46,10 +46,9 @@ def E_scattered(r, theta, phi, k_int, k_ext, a, E_0 = 1, N=N_max):
 
     assert (np.size(r)==np.size(theta))&(np.size(theta)==np.size(phi)) , "r, phi and theta should have the same size !!!"
    
-    pi_n, tau_n = spe.lpmn(1,N, np.cos(theta))
-    
-    #pi_n = pi_n/np.sin(theta)     
+    pi_n, tau_n = angle_functions(N, np.cos(theta))
 
+    print("angle function - OK ")
 
     E_s = np.zeros( (np.size(r),3) )
 
@@ -59,8 +58,8 @@ def E_scattered(r, theta, phi, k_int, k_ext, a, E_0 = 1, N=N_max):
 
         a_n, b_n = calc_coeff_scat(n, k_int, k_ext, a)
 
-        E_s = E_s  + E_n * ( np.i* a_n * N_e1n(n, 3, k_ext*r, theta, phi, pi_n, tau_n)    \
-                   -               b_n * M_o1n(n, 3, k_ext*r, theta, phi, pi_n, tau_n)  )
+        E_s = E_s  + E_n * ( np.i* a_n * N_e1n(n, 3, k_ext*r, theta, phi, pi_n[:,n-1], tau_n[:,n])    \
+                   -               b_n * M_o1n(n, 3, k_ext*r, theta, phi, pi_n[:,n-1], tau_n[:,n])  )
 
         ##end for 
 
@@ -69,7 +68,28 @@ def E_scattered(r, theta, phi, k_int, k_ext, a, E_0 = 1, N=N_max):
 
 
 
+def angle_functions(N, mu):
+    """
+    Recoded angle functions since lpmn function of the scipy special package is not vectorized
+    """
 
+    print( "In angle function ...")
+    pi_n ,tau_n = np.zeros( (mu.size, N) ) ,  np.zeros( (mu.size, N) ) 
+
+    pi_n[:,0] = 1    
+    pi_n[:,1] = 3*mu
+
+    tau_n[:,0] = mu 
+    tau_n[:,1] = 6*mu**2 -3
+
+    for n in range(2,N):
+        m = n+1
+
+        pi_n[:,n] = ( 2*m -1)/(m-1)* mu*pi_n[:,n-1] - m/(m-1)*pi_n[:,n-2]
+        
+        tau_n[:,n] = m*mu*pi_n[:,n] - (m+1)*pi_n[:,n-1]
+
+    return pi_n,tau_n
 
 
 
