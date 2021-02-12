@@ -4,7 +4,7 @@ import scipy.special as spe
 from coeff_int import calc_coeff_int
 from coeff_sca import calc_coeff_scat
 from spherical_vectors import M_o1n, M_e1n, N_e1n, N_o1n
-
+import coordinates as coor
 
 #############################################################
 ###        Script for field calculations                  ###
@@ -13,9 +13,25 @@ from spherical_vectors import M_o1n, M_e1n, N_e1n, N_o1n
 N_max = 10
 
 def E_internal(r, theta, phi, k_int, k_ext, a, E_0 = 1, N=N_max):
+    """
+    Computation of the field in a dielectric sphere for an incident OPP.
+    The calculations are based on [1] and use spherical harmonics decomposition.
+    
+    Params :
+    --------
+                r, theta, phi : array[float]  | coordinates of the grid on which the field is computed
+                k_int : real | wave vector of the inner medium
+                k_ext : real | wave vector of the outer medium
+                a     : real | radius of the sphere
+                E_0   : real | amplitude of the incident field (default : 1 V/m )
+                N     : int  | number of iterations/harmonics computed (default : N_max)
 
-    ## calculation of the associated legendre polynomials of the first order
-    ## from degre 0 to N, and their first derivative (tau_n)
+    Returns :
+    ---------
+                E_i :   array[complex], Nx3 | Internal field at each point of the grid, in each direction (spherical coordinates)
+
+    """
+
 
     assert (np.size(r)==np.size(theta))&(np.size(theta)==np.size(phi)) , "r, phi and theta should have the same size !!!"
 
@@ -40,9 +56,24 @@ def E_internal(r, theta, phi, k_int, k_ext, a, E_0 = 1, N=N_max):
 
 
 def E_scattered(r, theta, phi, k_int, k_ext, a, E_0 = 1, N=N_max):
+    """
+    Computation of the scattered field by a dielectric sphere for an incident OPP.
+    The calculations are based on [1] and use spherical harmonics decomposition.
+    
+    Params :
+    --------
+                r, theta, phi : array[float]  | coordinates of the grid on which the field is computed
+                k_int : real | wave vector of the inner medium
+                k_ext : real | wave vector of the outer medium
+                a     : real | radius of the sphere
+                E_0   : real | amplitude of the incident field (default : 1 V/m )
+                N     : int  | number of iterations/harmonics computed (default : N_max)
 
-    ## calculation of the associated legendre polynomials of the first order
-    ## from degre 0 to N, and their first derivative (tau_n)
+    Returns :
+    ---------
+                E_s :   array[complex], Nx3 | scattered field at each point of the grid, in each direction (spherical coordinates)
+
+    """
 
     assert (np.size(r)==np.size(theta))&(np.size(theta)==np.size(phi)) , "r, phi and theta should have the same size !!!"
    
@@ -90,4 +121,52 @@ def angle_functions(N, mu):
     return pi_n,tau_n
 
 
+
+
+def calc_E_field(X, k_int, k_ext, a, E_0=1, N=N_max):
+    """
+    Computation of the total electric field for the particular case of a sphere in an electric field (incident OPP).
+    The calculations are based on [1] and use spherical harmonics decomposition.
+    
+    Params :
+    --------
+                X     : grid | mesh coordinates X = [x, y, z] in cartesian coordinates
+                k_int : real | wave vector of the inner medium
+                k_ext : real | wave vector of the outer medium
+                a     : real | radius of the sphere
+                E_0   : real | amplitude of the incident field (default : 1 V/m )
+                N     : int  | number of iterations/harmonics computed (default : N_max)
+
+    Returns :
+    ---------
+                E     :   array[complex], Nx3 | Electric field at each point of the grid, in each direction in cartesian coordinates
+
+    """    
+    (r, theta, phi) = coor.cart2sph(X[0],X[1],X[2])
+
+    E = np.zeros((np.size(r),3), dtype=complex)
+
+    r_int, theta_int, phi_int = r[r<a], theta[r<a] , phi[r<a]    
+    r_ext, theta_ext, phi_ext = r[r>=a], theta[r>=a] , phi[r>=a]
+
+    print("Fields calculations ...")
+    E_int = E_internal(r_int,theta_int,phi_int, k_int,k_ext,a)
+    E_sca = E_scattered(r_ext,theta_ext,phi_ext, k_int,k_ext,a)
+    print("Fields computed !")
+
+    ## transform back the fields into cartesian coordinates
+    R = coor.Mat_sph2cart(theta,phi)
+
+    E_int = np.expand_dims(E_int, axis=1)@R[r<a,:,:]
+    E_int = E_int[:,0,:]
+
+    E_sca = np.expand_dims(E_sca, axis=1)@R[r>=a,:,:]
+    E_sca = E_sca[:,0,:]
+
+    ## total field => + OPP
+    E[r<a,:] = E_int
+    E[r>=a,:] = E_sca 
+    E[r>=a,0] =  E[r>=a,0] + np.exp(1j*k_ext * r[r>=a]*np.cos(theta[r>=a]))
+
+    return E
 
