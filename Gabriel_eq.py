@@ -190,13 +190,10 @@ def spectrum_computing(Params, f= np.logspace(1,8,10**4) , tissue = "some tissue
     """   
 
     ## init array
-    permitivities = np.zeros(np.size(f))
+    permitivities = np.zeros(np.size(f), dtype=complex)
 
     ## Compute the perm thanks to the function Gabriels_Permitivity. 
     permitivities = Gabriels_Permitivity( 2*np.pi*f, Params["ef"], Params["sig"], Params["deltas"], Params["alphas"], Params["taus"])
-
-    ## Get conductivitie : \omega Im(e)e_0
-    conduct = -np.imag(permitivities)*epsilon_0*2*np.pi*f
 
     if plot:
         ## plot of the real part of relative permitivity in log-log scale
@@ -210,6 +207,9 @@ def spectrum_computing(Params, f= np.logspace(1,8,10**4) , tissue = "some tissue
         ax1.set_ylabel("Relative permitivity ", color=color1)
         ax1.tick_params(axis='y', labelcolor=color1)
         ax1.set_xlabel( "frequency (Hz)")
+
+        ## Get conductivitie : \omega Im(e)e_0
+        conduct = -np.imag(permitivities)*epsilon_0*2*np.pi*f
 
         ax2.loglog(f, conduct, color=color2, linestyle='dashed' )
         ax2.set_ylabel("Conductivity (S/m)", color=color2)
@@ -344,8 +344,8 @@ def main():
 
     ## tissue(s) to investigate / Tissue(s) of Interest
     #tissue = "Brain (Grey Matter)"
-    tissues = np.array(["Bone (Cortical)"])
-    #tissues = np.array(["Bone (Cortical)", "Brain (White Matter)", "Brain (Grey Matter)", "Skin","Cerebrospinal Fluid"])
+    #tissues = np.array(["Bone (Cortical)"])
+    tissues = np.array(["Bone (Cortical)", "Brain (White Matter)", "Brain (Grey Matter)", "Skin","Cerebrospinal Fluid"])
 
     ## read the file 
     df = diel_read()
@@ -353,11 +353,13 @@ def main():
 
     ## array to store the frequency(ies) at which the relative error between QS and FW becomes higher than 1%
     min_f = np.zeros(tissues.shape)
+    print(tissues.shape)
 
     ## get parameters needed for Gabriel's model (Cole-Cole)S
     P = get_Params(df, tissues)
 
-
+    
+    ## section for plot of spectrum and classical error makeby QS to FW 
     for i,tissue in enumerate(tissues):
 
         ## get parameters for the i th tissue
@@ -365,10 +367,16 @@ def main():
         
         ## computing complex permitivity and plot it (10Hz - 100 kHz by default) 
         freqs= np.logspace(1,8,10**5)
-        spec = spectrum_computing(Params,f=freqs, tissue=tissue, plot=True)
+        spec = spectrum_computing(Params,f=freqs, tissue=tissue, plot=False)
 
         Rel_perm = spec.real
+        Conductivity = -np.imag(spec)*epsilon_0*2*np.pi*freqs
         #print(spec.size)
+
+        with open("RelPerm_"+tissue+".txt", 'w') as f_perm, open("Conduct_"+tissue+".txt", 'w') as f_cond:
+            for line in range(spec.size):
+                f_perm.write( str(freqs[line]) + ' '  +str(Rel_perm[line])+ '\n')
+                f_cond.write( str(freqs[line]) + ' '  + str(Conductivity[line])+ '\n')        
 
         ####  Plotting results #################################
 
@@ -383,7 +391,7 @@ def main():
         #plt.ylim((permitivities[-1].real/10,permitivities[0].real*10 )) ## set to have a little blanc range on top and bottom of the curve
         plt.grid()
 
-
+        
         ### Inspection of the caracteristique error factor 
         plt.subplot(212)
         #plt.semilogx(freqs, freqs**2 *Rel_perm *0.16**2 )
@@ -397,17 +405,16 @@ def main():
         ## get all freq for which the factor is greater than 1% and then get the first value (limit)
         err = freqs[  freqs**2 *Rel_perm *0.16**2 *mu_0*epsilon_0 > np.ones(Rel_perm.shape)*0.01   ]
         min_f[i] = err[0]
-
+        
     ## end for tissues
 
+    """
     print(tissues)
     print(min_f)
     print(np.log10(min_f))
-
-
-
-    ##  SECTION TO SAVE CONDUCT AND PERM IN TXT FILE FOR COMSOL IMPORT
     """
+    """
+    ##  SECTION TO SAVE CONDUCT AND PERM IN TXT FILE FOR COMSOL IMPORT
     with open("RelPerm_"+tissue+".txt", 'w') as f_perm, open("Conduct_"+tissue+".txt", 'w') as f_cond:
         for i in range(spec.size):
             f_perm.write( str(freqs[i]) + ' '  +str(Rel_perm[i])+ '\n')
