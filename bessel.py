@@ -65,6 +65,13 @@ def d_rh(n,x):
 
 if __name__=="__main__":
     
+
+    print("->    little test !!!!\n")
+    print("j01(3)")
+    print(spe.spherical_jn(0,3))
+    print("---------------\n")
+
+
     print("->    little test !!!!\n")
     print("h01(3)")
     print(hn1(0,3))
@@ -76,10 +83,30 @@ if __name__=="__main__":
 
     print("rh_01(3)")
     print(rh(0,3))
+    print("VS \n riccati bessel of python :")
+    print(spe.riccati_jn(0,3)[0] + 1j*spe.riccati_yn(0,3)[0])
     print("---------------\n")
 
     print("d_rh_01(3)")
     print(d_rh(0,3))
+    print("VS \n riccati bessel of python :")
+    print(spe.riccati_jn(0,3)[1] + 1j*spe.riccati_yn(0,3)[1])
+
+
+
+    print("\nrj_01(3)")
+    print(rj(0,3))
+    print("VS \n riccati bessel of python :")
+    print(spe.riccati_jn(0,3)[0] )
+
+    print("\nd_rj_01(3)")
+    print(d_rj(0,3))
+    print("VS \n riccati bessel of python :")
+    print(spe.riccati_jn(0,3)[1] )
+
+
+
+
     print("---------------\n")
 
 

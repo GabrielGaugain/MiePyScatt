@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import Mie_field_calculation as mie
+import mie_field_calculation as mie
 import Gabriel_eq as diel
 import scipy.constants as ctes
 import scipy.io as io
@@ -62,14 +62,14 @@ def main():
 
        
 
-    matFile = io.loadmat('../resultatsMie_1000_MHz.mat')
-    E_mat = np.array(matFile['E'])
+    matFile = io.loadmat('./res/resultatsMie_1000_MHz.mat')
+    E_mat = np.flipud( np.rot90(np.array(matFile['E']) ) )
 
 
     fig, axs = plt.subplots(1,3, sharex=True, sharey=True )
-    axs[0].pcolormesh(X[0],X[1], np.abs(E_mat[:,:,0])**2)
-    axs[1].pcolormesh(X[0],X[1], np.abs(E_mat[:,:,1])**2)
-    axs[2].pcolormesh(X[0],X[1], np.abs(E_mat[:,:,2])**2)
+    axs[0].pcolormesh(X[0],X[1], np.abs(Ex -E_mat[:,:,0])**2)
+    axs[1].pcolormesh(X[0],X[1], np.abs(Ey - E_mat[:,:,1])**2)
+    axs[2].pcolormesh(X[0],X[1], np.abs(Ez - E_mat[:,:,2])**2)
     axs[0].set_xlabel("x (cm)")
     axs[0].set_ylabel("y (cm)")
     plt.show()
