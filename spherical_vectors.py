@@ -78,11 +78,11 @@ def N_o1n(n, order, rho, theta,phi, pi_n, tau_n):
 
     n_o1n = np.zeros((np.size(theta),3 ), dtype=complex)
 
-    n_o1n[:,0] = np.sin(phi)* n*(n+1)* pi_n * z_n / rho             # e_r
+    n_o1n[:,0] = np.sin(phi)*np.sin(theta)* n*(n+1)* pi_n * z_n / rho   # e_r
 
-    n_o1n[:,1] = np.sin(phi) * tau_n * d_r /rho                     # e_theta
+    n_o1n[:,1] = np.sin(phi) * tau_n * d_r /rho                         # e_theta
 
-    n_o1n[:,2] = np.cos(phi) * tau_n * d_r/ rho                     # e_phi
+    n_o1n[:,2] = np.cos(phi) * tau_n * d_r/ rho                         # e_phi
 
     return n_o1n
 
@@ -104,11 +104,11 @@ def N_e1n(n, order, rho, theta,phi, pi_n, tau_n):
 
     n_e1n = np.zeros((np.size(theta),3 ), dtype=complex)
 
-    n_e1n[:,0] = np.cos(phi)* n*(n+1)* pi_n * z_n / rho             # e_r
+    n_e1n[:,0] = np.cos(phi)*np.sin(theta)* n*(n+1)* pi_n * z_n / rho   # e_r
 
-    n_e1n[:,1] = np.cos(phi) * tau_n * d_r /rho                     # e_theta
+    n_e1n[:,1] = np.cos(phi) * tau_n * d_r /rho                         # e_theta
 
-    n_e1n[:,2] =-np.sin(phi) * tau_n * d_r/ rho                     # e_phi
+    n_e1n[:,2] =-np.sin(phi) * tau_n * d_r/ rho                         # e_phi
 
     return n_e1n
 

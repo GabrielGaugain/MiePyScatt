@@ -8,7 +8,7 @@ def cart2sph(x,y,z):
    
     r = np.sqrt(x**2 + y**2 + z**2)
     phi = np.arctan2(y,x)
-    theta = np.arctan2( np.sqrt(x**2 + y**2), z  )
+    theta = np.pi/2.0 - np.arctan( z/np.sqrt(x**2 + y**2) )
 
     #toc = time.time()
     #print("tooks "+ str(toc-tic) +" s to convert coorinates")
@@ -30,7 +30,7 @@ def Mat_sph2cart(theta,phi):
 
     M[:,0,0]= np.sin(theta) * np.cos(phi)
     M[:,0,1]= np.cos(theta) * np.cos(phi)
-    M[:,0,0]= - np.sin(phi)
+    M[:,0,2]= - np.sin(phi)
 
     M[:,1,0]= np.sin(theta) * np.sin(phi)
     M[:,1,1]= np.cos(theta) * np.sin(phi)

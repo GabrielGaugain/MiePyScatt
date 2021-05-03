@@ -39,11 +39,11 @@ def E_internal(r, theta, phi, k_int, k_ext, a, E_0 = 1, N=N_max):
 
     #pi_n = pi_n/np.sin(theta)     
 
-    E_i = np.zeros( (np.size(r), 3) )
+    E_i = np.zeros( (np.size(r), 3), dtype=complex )
 
     for n in range(1,N+1):
 
-        E_n = E_0* 1j**(n) * (2*n + 1)/( n * (n+1) )
+        E_n = E_0* 1j**n * (2*n + 1)/( n * (n+1) )
 
         c_n, d_n = calc_coeff_int(n, k_int, k_ext, a)
 
@@ -79,7 +79,7 @@ def E_scattered(r, theta, phi, k_int, k_ext, a, E_0 = 1, N=N_max):
    
     pi_n, tau_n = angle_functions(N, np.cos(theta))
 
-    E_s = np.zeros( (np.size(r),3) )
+    E_s = np.zeros( (np.size(r),3), dtype=complex )
 
     for n in range(1,N+1):
 
@@ -155,14 +155,31 @@ def calc_E_field(X, k_int, k_ext, a, E_0=1, N=N_max):
     print("Fields computed !")
 
     ## transform back the fields into cartesian coordinates
+    
+    
+    for i in range(theta_int.size):
+        R= coor.Mat_sph2cart(theta_int[i],phi_int[i])
+        E_int[i,:] = R@E_int[i,:]
+
+    for i in range(theta_ext.size):
+        R= coor.Mat_sph2cart(theta_ext[i],phi_ext[i])
+        E_sca[i,:] = R@E_sca[i,:]
+
+
+    """    
     R = coor.Mat_sph2cart(theta,phi)
 
-    E_int = np.expand_dims(E_int, axis=1)@R[r<a,:,:]
+    print("E size : ", E_int.shape )
+    print("R size : ", R.shape)
+
+    E_int = R[r<a,:,:]@np.expand_dims(E_int, axis=0)
+    print("E size : ", E_int.shape )
+
     E_int = E_int[:,0,:]
 
-    E_sca = np.expand_dims(E_sca, axis=1)@R[r>=a,:,:]
+    E_sca = R[r>=a,:,:]@np.expand_dims(E_sca, axis=0)
     E_sca = E_sca[:,0,:]
-
+    """
     ## total field => + OPP
     E[r<a,:] = E_int
     E[r>=a,:] = E_sca 

@@ -34,7 +34,7 @@ def calc_coeff_int(n,k_int, k_ext, a):
       """
 
       ## usefull parameters for calculations
-      x = k_int*a
+      x = k_ext*a
       m = k_int/k_ext
 
       ## calculation of the coefficient from boundary conditions (see [1])

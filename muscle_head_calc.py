@@ -3,20 +3,22 @@ import matplotlib.pyplot as plt
 import Mie_field_calculation as mie
 import Gabriel_eq as diel
 import scipy.constants as ctes
+import scipy.io as io
 import coordinates as coor
 
 def main():
 
     ## frequency(ies) of interest
-    f = 0.39035*10**9
+    f = 10**9
     lmda = ctes.c / f
 
-    n_ext = 1                   # outer refrective index : 1 for the air
+    n_ext = 1.0                   # outer refrective index : 1 for the air
     k_ext = 2*np.pi/lmda * n_ext 
 
     ## medium of the sphere
     tissue = "Muscle"
     perm, cond = diel.get_diel_properties(tissue, freqs=f)
+    print(perm, cond)
 
     n_int = np.sqrt(perm)   ## without loss => no cmplx part contrib
     print("n_int : " ,n_int)
@@ -26,7 +28,7 @@ def main():
     print("kint : ", k_int)
 
     #####################################
-    a = 0.1                             # 20 cm , radius of the sphere
+    a = 0.1                             # 20 cm diameter sphere
     L_x, L_y, L_z = 0.4, 0.4, 0.4       # size of the grid on which to compute the fields
     N_x, N_y, N_z = 150,150,150         # number of points in each direction of the grid 
 
@@ -52,15 +54,28 @@ def main():
     Ez = E[:,2].reshape(X[0].shape)
     
     fig, axs = plt.subplots(1,3, sharex=True, sharey=True )
-    axs[0].pcolormesh(X[0],X[1], np.abs(Ex))
-    axs[1].pcolormesh(X[0],X[1], np.abs(Ey))
-    axs[2].pcolormesh(X[0],X[1], np.abs(Ez))
+    axs[0].pcolormesh(X[0],X[1], np.abs(Ex)**2)
+    axs[1].pcolormesh(X[0],X[1], np.abs(Ey)**2)
+    axs[2].pcolormesh(X[0],X[1], np.abs(Ez)**2)
     axs[0].set_xlabel("x (cm)")
     axs[0].set_ylabel("y (cm)")
 
-    plt.show()    
+       
 
-    
+    matFile = io.loadmat('../resultatsMie_1000_MHz.mat')
+    E_mat = np.array(matFile['E'])
+
+
+    fig, axs = plt.subplots(1,3, sharex=True, sharey=True )
+    axs[0].pcolormesh(X[0],X[1], np.abs(E_mat[:,:,0])**2)
+    axs[1].pcolormesh(X[0],X[1], np.abs(E_mat[:,:,1])**2)
+    axs[2].pcolormesh(X[0],X[1], np.abs(E_mat[:,:,2])**2)
+    axs[0].set_xlabel("x (cm)")
+    axs[0].set_ylabel("y (cm)")
+    plt.show()
+
+    print(np.nanmean(np.abs(Ex-E_mat[:,:,0])**2))
+
     ##end main
 
 

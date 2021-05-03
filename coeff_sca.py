@@ -40,10 +40,10 @@ def calc_coeff_scat(n,k_int, k_ext, a):
 
       ## Calculation of the scattered fierld coefficients for the nth mode (based on [1])
       a_n = ( m* rj(n,m*x) * d_rj(n,x) -    rj(n,x) * d_rj(n,m*x)   )/  \
-            ( m* rj(n,m*x) * d_rh(n,x) -  m*rh(n,x) * d_rj(n,m*x)   )
+            ( m* rj(n,m*x) * d_rh(n,x) -    rh(n,x) * d_rj(n,m*x)   )
       
-      b_n = (  rj(n,m*x) * d_rj(n,x)   -  m* rj(n,x) * d_rj(n,x)    )/  \
-            (  rj(n,m*x) * d_rh(n,m*x) -  m* rh(n,x) * d_rj(n,m*x)  )
+      b_n = (  rj(n,m*x) * d_rj(n,x) -  m* rj(n,x) * d_rj(n,x)    )/  \
+            (  rj(n,m*x) * d_rh(n,x) -  m* rh(n,x) * d_rj(n,m*x)  )
 
 
       return (a_n,b_n)
