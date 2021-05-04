@@ -11,7 +11,7 @@ import quasi_static as qs
 def main():
 
     ## frequency(ies) of interest
-    f = 10**4
+    f = 10**3
     lmda = ctes.c / f
 
     n_ext = 1.0                   # outer refrective index : 1 for the air
@@ -58,9 +58,13 @@ def main():
     Ez = E[:,2].reshape(X[0].shape)
     
     fig, axs = plt.subplots(1,3, sharex=True, sharey=True )
-    axs[0].pcolormesh(X[0],X[1], np.abs(Ex)**2)
-    axs[1].pcolormesh(X[0],X[1], np.abs(Ey)**2)
-    axs[2].pcolormesh(X[0],X[1], np.abs(Ez)**2)
+    c1 = axs[0].pcolormesh(X[0],X[1], np.abs(Ex)**2)
+    cbar1 = fig.colorbar(c1, ax=axs[0])
+    c2 = axs[1].pcolormesh(X[0],X[1], np.abs(Ey)**2)
+    cbar2 = fig.colorbar(c2, ax=axs[1])
+    c3 = axs[2].pcolormesh(X[0],X[1], np.abs(Ez)**2)
+    cbar3 =  fig.colorbar(c3, ax=axs[2])
+
     axs[0].set_xlabel("x (cm)")
     axs[0].set_ylabel("y (cm)")
 
@@ -72,9 +76,12 @@ def main():
     Eqsz = Eqs[:,2].reshape(X[0].shape)
     
     fig, axs = plt.subplots(1,3, sharex=True, sharey=True )
-    axs[0].pcolormesh(X[0],X[1], np.abs(Eqsx)**2)
-    axs[1].pcolormesh(X[0],X[1], np.abs(Eqsy)**2)
-    axs[2].pcolormesh(X[0],X[1], np.abs(Eqsz)**2)
+    c1=axs[0].pcolormesh(X[0],X[1], np.abs(Eqsx)**2)
+    cbar = fig.colorbar(c1, ax=axs[0])
+    c2=axs[1].pcolormesh(X[0],X[1], np.abs(Eqsy)**2)
+    cbar2 = fig.colorbar(c2, ax=axs[1])
+    c3=axs[2].pcolormesh(X[0],X[1], np.abs(Eqsz)**2)
+    cbar = fig.colorbar(c3, ax=axs[2])
     axs[0].set_xlabel("x (cm)")
     axs[0].set_ylabel("y (cm)")   
     plt.show()
