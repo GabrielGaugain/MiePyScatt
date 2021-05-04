@@ -5,11 +5,13 @@ import Gabriel_eq as diel
 import scipy.constants as ctes
 import scipy.io as io
 import coordinates as coor
+import quasi_static as qs
+
 
 def main():
 
     ## frequency(ies) of interest
-    f = 10**9
+    f = 10**4
     lmda = ctes.c / f
 
     n_ext = 1.0                   # outer refrective index : 1 for the air
@@ -27,6 +29,8 @@ def main():
     k_int = k_int[0,0]
     print("kint : ", k_int)
 
+    e_int = perm
+    e_ext = 1.0
     #####################################
     a = 0.1                             # 20 cm diameter sphere
     L_x, L_y, L_z = 0.4, 0.4, 0.4       # size of the grid on which to compute the fields
@@ -60,8 +64,24 @@ def main():
     axs[0].set_xlabel("x (cm)")
     axs[0].set_ylabel("y (cm)")
 
-       
 
+    Eqs = qs.quasi_stat_field([x,y,z], e_int, e_ext, a)    
+
+    Eqsx = Eqs[:,0].reshape(X[0].shape)
+    Eqsy = Eqs[:,1].reshape(X[0].shape)
+    Eqsz = Eqs[:,2].reshape(X[0].shape)
+    
+    fig, axs = plt.subplots(1,3, sharex=True, sharey=True )
+    axs[0].pcolormesh(X[0],X[1], np.abs(Eqsx)**2)
+    axs[1].pcolormesh(X[0],X[1], np.abs(Eqsy)**2)
+    axs[2].pcolormesh(X[0],X[1], np.abs(Eqsz)**2)
+    axs[0].set_xlabel("x (cm)")
+    axs[0].set_ylabel("y (cm)")   
+    plt.show()
+
+
+       
+    """
     matFile = io.loadmat('./res/resultatsMie_1000_MHz.mat')
     E_mat = np.flipud( np.rot90(np.array(matFile['E']) ) )
 
@@ -75,6 +95,7 @@ def main():
     plt.show()
 
     print(np.nanmean(np.abs(Ex-E_mat[:,:,0])**2))
+    """
 
     ##end main
 
