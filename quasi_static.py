@@ -6,7 +6,7 @@ import Gabriel_eq as diel
 
 ## See Jackson p180-184
 
-def quasi_stat_field(X, e_int, e_ext, a, E_0=1):
+def quasi_stat_field(X, e_int, e_ext, a, E_0=1.0):
 
 
     m = e_int/e_ext
@@ -27,9 +27,10 @@ def quasi_stat_field(X, e_int, e_ext, a, E_0=1):
     #E_int[:,0] = - 3.0/(2 + m) * E_0 * np.sin(theta_int)        #e_theta
     #E_int[:,0] =            #e_phi
 
-    E_sca[:,0] =  (m -1)/(m +2) * E_0   *a**3 /r_ext**3           #e_r
-    E_sca[:,0] =  (m -1)/(m +2) * E_0   *a**3 /r_ext**3*np.sin(theta_ext)            #e_theta
-    #E_sca[:,0] =            #e_phi
+
+    E_sca[:,0] =  -(m -1)/(m +2) * E_0   *a**3 /r_ext**3 * np.cos(phi_ext)  *2         #e_r
+    E_sca[:,2] =  -(m -1)/(m +2) * E_0   *a**3 /r_ext**3 * np.sin(phi_ext) *2     #e_phi
+    #E_sca[:,0] =            #e_theta
 
     ## transform back the fields into cartesian coordinates
     """
@@ -44,15 +45,14 @@ def quasi_stat_field(X, e_int, e_ext, a, E_0=1):
 
     E[r<a,:] = E_int
     E[r>=a,:] = E_sca 
-    E[r>=a,0] =  E[r>=a,0] +  E_0
-
+    E[r>=a,0] =  E[r>=a,0] + E_0
 
     return E
 
 def main():
 
     ## frequency(ies) of interest
-    f = 10**3
+    f = 10**6
     e_ext = 1.0                   # outer relative permittivity : 1 for the air
 
     ## medium of the sphere

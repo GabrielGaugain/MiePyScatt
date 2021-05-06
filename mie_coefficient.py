@@ -85,7 +85,7 @@ def int_coeff(n, x, m):
 
 
       d_n = ( m*   rj(n,x )  * d_rh(n,x) - m* rh(n,x) * d_rj(n,x)    )/  \
-            ( m* rj(n,m*x) * d_rh(n,x) -    rh(n,x) * d_rj(n,m*x)  )
+            ( m*m* rj(n,m*x) * d_rh(n,x) -    rh(n,x) * d_rj(n,m*x)  )
 
 
       return (c_n, d_n)

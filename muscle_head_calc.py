@@ -11,7 +11,7 @@ import quasi_static as qs
 def main():
 
     ## frequency(ies) of interest
-    f = 10**3
+    f = 10**6
     lmda = ctes.c / f
 
     n_ext = 1.0                   # outer refrective index : 1 for the air
@@ -31,6 +31,7 @@ def main():
 
     e_int = perm
     e_ext = 1.0
+
     #####################################
     a = 0.1                             # 20 cm diameter sphere
     L_x, L_y, L_z = 0.4, 0.4, 0.4       # size of the grid on which to compute the fields
@@ -68,10 +69,9 @@ def main():
     axs[0].set_xlabel("x (cm)")
     axs[0].set_ylabel("y (cm)")
 
-
     Eqs = qs.quasi_stat_field([x,y,z], e_int, e_ext, a)    
 
-    Eqsx = Eqs[:,0].reshape(X[0].shape)
+    Eqsx = Eqs[:,0].reshape(X[0].shape).T
     Eqsy = Eqs[:,1].reshape(X[0].shape)
     Eqsz = Eqs[:,2].reshape(X[0].shape)
     
@@ -89,7 +89,7 @@ def main():
 
        
     """
-    matFile = io.loadmat('./res/resultatsMie_1000_MHz.mat')
+    matFile = io.loadmat('./res/resultatsMie_1_MHz.mat')
     E_mat = np.flipud( np.rot90(np.array(matFile['E']) ) )
 
 

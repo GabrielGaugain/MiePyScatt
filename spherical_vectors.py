@@ -120,7 +120,6 @@ def angle_functions(N, mu):
     Recoded angle functions since lpmn function of the scipy special package is not vectorized
     """
 
-    print( "In angle function ...")
     pi_n ,tau_n = np.zeros( (mu.size, N+1) ) ,  np.zeros( (mu.size, N+1) ) 
 
     pi_n[:,0] = 0    

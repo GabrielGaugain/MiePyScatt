@@ -36,8 +36,6 @@ def E_internal(r, theta, phi, k_int, k_ext, a, E_0 = 1, N=N_max):
 
     pi_n, tau_n = angle_functions(N, np.cos(theta))
 
-    #pi_n = pi_n/np.sin(theta)     
-
     E_i = np.zeros( (np.size(r), 3), dtype=complex )
 
     for n in range(1,N+1):
@@ -130,8 +128,6 @@ def calc_E_field(X, k_int, k_ext, a, E_0=1, N=N_max):
     print("Fields computed !")
 
     ## transform back the fields into cartesian coordinates
-    
-    
     for i in range(theta_int.size):
         R= coor.Mat_sph2cart(theta_int[i],phi_int[i])
         E_int[i,:] = R@E_int[i,:]
